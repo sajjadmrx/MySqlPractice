@@ -27,10 +27,19 @@ con.connect(function (err) {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// get all users
+// get users
 app.get('/api/users', async (req, res, next) => {
-    const users = await query("SELECT * FROM users")
+    const email = req.query.email
+    let quer = `SELECT * FROM users`
+
+    if (email)
+        quer = `SELECT * FROM users WHERE email = "${email}"`;
+
+
+    const users = await query(quer)
     res.send(users)
+
+
 });
 
 // create user
@@ -44,6 +53,7 @@ app.post('/api/users', async (req, res, next) => {
     user = await query(`INSERT INTO users (name,email,password) VALUES (${items})`, [name, email, password])
     res.status(201).send(user)
 })
+
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
